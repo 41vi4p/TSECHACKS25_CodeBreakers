@@ -59,6 +59,7 @@ const Dashboard = () => {
       signer
     );
     setIsWalletConnected(true);
+    setWalletAddress((await signer.getAddress()).toString());
   };
 
   return (
@@ -168,7 +169,7 @@ const Dashboard = () => {
                         </div>
                       ) : (
                         <p className="text-sm text-gray-400">
-                          No wallet connected
+                          
                         </p>
                       )}
                     </div>
