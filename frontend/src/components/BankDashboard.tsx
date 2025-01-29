@@ -19,9 +19,9 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
 const BankDashboard = () => {
-  const [applicants, setApplicants] = useState([]);
-  const [selectedApplicant, setSelectedApplicant] = useState(null);
-  const [approvedApplications, setApprovedApplications] = useState([]);
+  const [applicants, setApplicants] = useState<{ id: number; name: string; loanAmount: string; status: string; }[]>([]);
+  const [selectedApplicant, setSelectedApplicant] = useState<{ id: number; name: string; loanAmount: string; status: string; } | null>(null);
+  const [approvedApplications, setApprovedApplications] = useState<{ id: number; name: string; loanAmount: string; status: string; }[]>([]);
 
   useEffect(() => {
     // Fetch applicants from the database
@@ -38,7 +38,7 @@ const BankDashboard = () => {
     fetchApplicants();
   }, []);
 
-  const handleSelectApplicant = (applicant) => {
+  const handleSelectApplicant = (applicant: { id: number; name: string; loanAmount: string; status: string; }) => {
     setSelectedApplicant(applicant);
   };
 
@@ -71,7 +71,8 @@ const BankDashboard = () => {
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
       <div className="flex h-screen">
         {/* Sidebar */}
-        <div className="w-20 bg-gray-800/60 backdrop-blur-xl border-r border-gray-700">
+    {/*    
+    <div className="w-20 bg-gray-800/60 backdrop-blur-xl border-r border-gray-700">
           <div className="flex flex-col items-center h-full py-4">
             <div className="mb-8">
               <Avatar className="h-12 w-12">
@@ -129,7 +130,7 @@ const BankDashboard = () => {
             </div>
           </div>
         </div>
-
+*/}
         {/* Main Content */}
         <div className="flex w-full flex-col overflow-auto">
           {/* Header */}
