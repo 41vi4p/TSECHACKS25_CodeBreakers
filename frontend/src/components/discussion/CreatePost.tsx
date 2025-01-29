@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase'; // Adjust the import path as necessary
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Adjust the import path as necessary
+import { Button } from '@/components/ui/button'; // Adjust the import path as necessary
 
-type Post = {
+interface Post {
   id: number;
   title: string;
   author: string;
@@ -8,16 +12,14 @@ type Post = {
   upvotes: number;
   comments: number;
   timeAgo: string;
-};
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'; // Adjust the import path as necessary
-import { Button } from '@/components/ui/button'; // Adjust the import path as necessary
+}
 
 const CreatePost: React.FC<{ onCreate: (post: Post) => void }> = ({ onCreate }) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [content, setContent] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !author || !content) {
       alert('Please fill in all fields');
@@ -32,10 +34,16 @@ const CreatePost: React.FC<{ onCreate: (post: Post) => void }> = ({ onCreate }) 
       comments: 0,
       timeAgo: 'Just now',
     };
-    onCreate(newPost);
-    setTitle('');
-    setAuthor('');
-    setContent('');
+    try {
+      const docRef = await addDoc(collection(db, 'posts'), newPost);
+      console.log('Document written with ID: ', docRef.id);
+      onCreate(newPost);
+      setTitle('');
+      setAuthor('');
+      setContent('');
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
   };
 
   return (

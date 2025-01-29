@@ -28,9 +28,11 @@ export default function Sidebar() {
   const handleCreatePost = (newPost: Post) => {
     setPosts([newPost, ...posts]);
   };
-const handleClick = () => {
-setIsCreatingPost(!isCreatingPost);
-}
+
+  const handleClick = () => {
+    setIsCreatingPost(!isCreatingPost);
+  };
+
   return (
     <div className="w-full md:w-1/3 space-y-6">
       <Card className="bg-gray-800/60 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl">
@@ -66,8 +68,6 @@ setIsCreatingPost(!isCreatingPost);
         </CardContent>
       </Card>
       {isCreatingPost && <CreatePost onCreate={handleCreatePost} />}
-  </div>
-  )
-    
-    
+    </div>
+  );
 }
