@@ -18,7 +18,7 @@ import {
   Database,
   Brain,
   UserCheck,
-  UserPlus, FileSearch, CheckCircle, Bell
+  UserPlus, FileSearch, CheckCircle, Bell,
   Twitter,
   LinkedinIcon as LinkedIn,
   GitlabIcon as GitHub,
@@ -339,7 +339,7 @@ export function Hero() {
     <section className="relative h-screen flex items-center">
       <div
         className="absolute inset-0 bg-cover bg-center z-0"
-        style={{ backgroundImage: "url('/hero-background.jpg')" }}
+        style={{ backgroundImage: "url('/hero-background.png')" }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-secondary/50 z-10" />
       <div className="container mx-auto relative z-20 text-white">
@@ -483,7 +483,7 @@ const testimonials = [
 
 const partners = ["/logo1.svg", "/logo2.svg", "/logo3.svg", "/logo4.svg", "/logo5.svg", "/logo6.svg"]
 
-export default function Testimonials() {
+export function Testimonials() {
   return (
     <section id="testimonials" className="py-20 bg-muted">
       <div className="container mx-auto">
