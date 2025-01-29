@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiUser, FiMail, FiPhone, FiHome, FiFileText, FiCamera } from 'react-icons/fi';
-import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
-import { collection, addDoc } from 'firebase/firestore';
+import { FiUser, FiMail, FiPhone, FiHome, FiFileText, FiCamera, FiLock } from 'react-icons/fi';
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+
+const auth = getAuth();
+const db = getFirestore();
 
 const SignUpForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -13,14 +16,8 @@ const SignUpForm: React.FC = () => {
     contact: '',
     address: '',
     email: '',
-    identityProof: '',
-    addressProof: '',
-    incomeProof: '',
-    bankStatements: '',
-    photographs: '',
-    loanApplicationForm: '',
-    propertyDocuments: '',
-    educationalProof: ''
+    password: '',
+    identityProof: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,15 +31,17 @@ const SignUpForm: React.FC = () => {
     e.preventDefault();
     setError('');
     
-    if (!formData.name || !formData.contact || !formData.address || !formData.email) {
+    if (!formData.name || !formData.contact || !formData.address || !formData.email || !formData.password) {
       setError('Please fill in all required fields');
       return;
     }
 
     try {
       setLoading(true);
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      await sendEmailVerification(userCredential.user);
       await addDoc(collection(db, 'users'), formData);
-      console.log('User added:', formData);
+      console.log('User added and verification email sent:', formData);
     } catch (err) {
       setError('Sign-up failed. Please try again.');
       console.error(err);
@@ -127,6 +126,22 @@ const SignUpForm: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email Address"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 text-sm sm:text-base
+                  rounded-lg outline-none transition-all
+                  bg-gray-700/50 text-white focus:bg-gray-700/70
+                  border border-gray-600 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="relative">
+              <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 
+                text-gray-400 text-lg sm:text-xl" />
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Password"
                 className="w-full pl-10 pr-4 py-2.5 sm:py-3 text-sm sm:text-base
                   rounded-lg outline-none transition-all
                   bg-gray-700/50 text-white focus:bg-gray-700/70
