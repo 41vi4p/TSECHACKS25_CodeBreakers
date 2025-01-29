@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ethers } from "ethers";
 // import { FiDollarSign, FiPercent, FiCalendar } from 'lucide-react';
 import { MetaMaskSDK } from "@metamask/sdk";
+import LoanManagement from "../../../../artifacts/contracts/FraudChain.sol/LoanManagement.json";
 
 const MMSDK = new MetaMaskSDK({
   dappMetadata: {
@@ -14,7 +15,14 @@ const MMSDK = new MetaMaskSDK({
 });
 
 const LoanApplicationForm = () => {
-  const ethereum = MMSDK.getProvider();
+  const ethereum: undefined | any = MMSDK.getProvider();
+  const ABI = LoanManagement.abi;
+  const address = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const walletProvider = new ethers.JsonRpcProvider(
+    ethereum
+  )
+
+
   const [formData, setFormData] = useState({
     amount: "",
     interestRate: "",
@@ -31,8 +39,7 @@ const LoanApplicationForm = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const ConnectClick = async () => {
     const accounts = await MMSDK.connect();
 
     // Make requests
@@ -40,6 +47,17 @@ const LoanApplicationForm = () => {
       method: "eth_accounts",
       params: [],
     });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const contract =  new ethers.Contract(
+        address,
+        ABI,
+        walletProvider,
+    )
+    const tx = await contract.applyForLoan(formData.amount, formData.interestRate, formData.duration); 
+    console.log(tx);
   };
 
   return (
@@ -55,6 +73,7 @@ const LoanApplicationForm = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          <button onClick={ConnectClick}>connect</button>
           <div className="space-y-3 sm:space-y-4">
             {/* Amount Input */}
             <div className="relative">
