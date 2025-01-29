@@ -1,34 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { MetaMaskSDK } from "@metamask/sdk";
 import { DollarSign, Percent, Calendar } from "lucide-react";
 import LoanManagement from "../../../../artifacts/contracts/FraudChain.sol/LoanManagement.json";
 
-// Initialize MetaMask SDK outside component to avoid recreation on renders
-const MMSDK = new MetaMaskSDK({
-  dappMetadata: {
-    name: "Loan Application Dapp",
-    url: window.location.href,
-  }
-});
+// We'll initialize MetaMask SDK only on the client side
+let MMSDK: any = null;
 
 const LoanApplicationForm = () => {
   const [formData, setFormData] = useState({
     amount: "",
     interestRate: "",
-    duration: ""
+    duration: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [account, setAccount] = useState("");
+  const [isClient, setIsClient] = useState(false);
+
+  // Initialize MetaMask SDK only after component mounts
+  useEffect(() => {
+    const initializeMetaMask = async () => {
+      if (typeof window !== "undefined") {
+        const { MetaMaskSDK } = await import("@metamask/sdk");
+        MMSDK = new MetaMaskSDK({
+          dappMetadata: {
+            name: "Loan Application Dapp",
+            url: window.location.href,
+          },
+        });
+        setIsClient(true);
+      }
+    };
+
+    initializeMetaMask();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -36,14 +49,18 @@ const LoanApplicationForm = () => {
     try {
       setLoading(true);
       setError("");
-      
+
+      if (!MMSDK) {
+        throw new Error("MetaMask SDK not initialized");
+      }
+
       const ethereum = MMSDK.getProvider();
       if (!ethereum) {
         throw new Error("Please install MetaMask to use this application");
       }
 
       const accounts = await ethereum.request({
-        method: "eth_requestAccounts"
+        method: "eth_requestAccounts",
       });
 
       if (accounts && accounts[0]) {
@@ -58,13 +75,17 @@ const LoanApplicationForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       setLoading(true);
       setError("");
 
       if (!account) {
         throw new Error("Please connect your wallet first");
+      }
+
+      if (!MMSDK) {
+        throw new Error("MetaMask SDK not initialized");
       }
 
       const ethereum = MMSDK.getProvider();
@@ -88,20 +109,40 @@ const LoanApplicationForm = () => {
       const tx = await contract.applyForLoan(amount, interestRate, duration);
       await tx.wait(); // Wait for transaction to be mined
 
+      // const block = await provider.getBlockNumber();
+      // const filter = contract.filters.LoanApplied();
+      // const loanApplied = await contract.queryFilter(
+      //   filter,
+      //   block - 20,
+      //   block
+      // );
+      // await console.log(loanApplied);
       // Clear form after successful submission
       setFormData({
         amount: "",
         interestRate: "",
-        duration: ""
+        duration: "",
       });
-      
+
       alert("Loan application submitted successfully!");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit loan application");
+      setError(
+        err instanceof Error ? err.message : "Failed to submit loan application"
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
+        <div className="w-full max-w-[95%] sm:max-w-[440px] p-4 sm:p-6 md:p-8 bg-gray-800/60 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl">
+          <div className="text-center text-white">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
@@ -194,3 +235,7 @@ const LoanApplicationForm = () => {
 };
 
 export default LoanApplicationForm;
+
+// (await loanApplied).map((event) => {
+//   console.log(event.args.loanId.toString());
+// });
