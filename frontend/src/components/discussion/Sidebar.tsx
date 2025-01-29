@@ -1,6 +1,18 @@
+'use client';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import CreatePost from './CreatePost'; // Adjust the import path as necessary
+import { useState } from "react";
 
+type Post = {
+  id: number;
+  title: string;
+  author: string;
+  content: string;
+  upvotes: number;
+  comments: number;
+  timeAgo: string;
+};
 const trendingTopics = [
   "Ethereum 2.0",
   "DeFi Yield Farming",
@@ -10,6 +22,17 @@ const trendingTopics = [
 ]
 
 export default function Sidebar() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isCreatingPost, setIsCreatingPost] = useState(false);
+
+  const handleCreatePost = (newPost: Post) => {
+    setPosts([newPost, ...posts]);
+  };
+
+  const handleClick = () => {
+    setIsCreatingPost(!isCreatingPost);
+  };
+
   return (
     <div className="w-full md:w-1/3 space-y-6">
       <Card className="bg-gray-800/60 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl">
@@ -37,12 +60,14 @@ export default function Sidebar() {
             Welcome to BlockchainTalk, the premier forum for discussing the latest in blockchain technology and
             cryptocurrencies.
           </p>
-          <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white">
+          <Button 
+          onClick={handleClick}
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white">
             Create Post
           </Button>
         </CardContent>
       </Card>
+      {isCreatingPost && <CreatePost onCreate={handleCreatePost} />}
     </div>
-  )
+  );
 }
-

@@ -28,9 +28,7 @@ export default function Header() {
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5 text-gray-400" />
           </Button>
-          <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white">
-            Sign In
-          </Button>
+          
         </div>
       </div>
     </header>
