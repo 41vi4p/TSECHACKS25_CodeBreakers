@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ethers } from "ethers";
-import LoanManagement from "../../../artifacts/contracts/FraudChain.sol/LoanManagement.json";
+//import LoanManagement from "../../../artifacts/contracts/FraudChain.sol/LoanManagement.json";
 
 const Dashboard = () => {
   useEffect(() => {
@@ -53,11 +53,11 @@ const Dashboard = () => {
     const ethereum = MMSDK.getProvider();
     const provider = new ethers.BrowserProvider(ethereum);
     const signer = await provider.getSigner();
-    const contract = new ethers.Contract(
-      "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-      LoanManagement.abi,
-      signer
-    );
+   // const contract = new ethers.Contract(
+     // "//0x5FbDB2315678afecb367f032d93F642f64180aa3",
+     // LoanManagement.abi,
+     // signer
+   // );
     setIsWalletConnected(true);
     setWalletAddress((await signer.getAddress()).toString());
   };
