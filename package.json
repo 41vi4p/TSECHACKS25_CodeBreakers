@@ -4,6 +4,7 @@
     "hardhat": "^2.22.18"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
     "bcryptjs": "^2.4.3",
     "firebase": "^11.2.0",
     "neo4j-driver": "^5.27.0",
