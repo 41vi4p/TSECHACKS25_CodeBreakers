@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiUser, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import { auth } from '@/lib/firebase'; // Adjust the import path as necessary
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
@@ -34,12 +34,12 @@ const OrganisationLoginForm: React.FC = () => {
 
     try {
       setLoading(true);
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      await signInWithEmailAndPassword(auth, formData.email, formData.password); // Use the raw password
       console.log('Organisation login successful:', formData);
       router.push('/organisationDashboard'); // Replace '/organisationDashboard' with the actual path of the organization dashboard page
-    } catch (err) {
-      setError('Authentication failed. Please try again.');
-      console.error(err);
+    } catch (err: any) {
+      setError(`Authentication failed: ${err.message}`);
+      console.error('Error during authentication:', err);
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,7 @@ const OrganisationLoginForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="space-y-3 sm:space-y-4">
             <div className="relative">
-              <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="email"
@@ -81,7 +81,7 @@ const OrganisationLoginForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type={showPassword ? "text" : "password"}
@@ -100,7 +100,7 @@ const OrganisationLoginForm: React.FC = () => {
                   text-gray-400 hover:text-gray-300 text-lg sm:text-xl"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <FiEyeOff /> : <FiEye />}
+                {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
           </div>

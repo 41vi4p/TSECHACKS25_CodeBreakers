@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { FiUser, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { User, Lock, Eye, EyeOff } from 'lucide-react';
 import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
 import { collection, addDoc } from 'firebase/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -61,7 +61,7 @@ const SignInForm: React.FC = () => {
             className="text-2xl sm:text-3xl md:text-4xl font-bold 
             bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent"
           >
-            NextGen Banking
+            FraudChain
           </h1>
           <p className="mt-2 text-xs sm:text-sm text-gray-400">
             Secure Access to Your Future
@@ -71,7 +71,7 @@ const SignInForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="space-y-3 sm:space-y-4">
             <div className="relative">
-              <FiUser
+              <User
                 className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl"
               />
@@ -89,7 +89,7 @@ const SignInForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiLock
+              <Lock
                 className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl"
               />
@@ -111,7 +111,7 @@ const SignInForm: React.FC = () => {
                   text-gray-400 hover:text-gray-300 text-lg sm:text-xl"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <FiEyeOff /> : <FiEye />}
+                {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
           </div>

@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiUser, FiLock, FiEye, FiEyeOff, FiMail, FiPhone, FiBriefcase } from 'react-icons/fi';
+import { User, Lock, Eye, EyeOff, Mail, Phone, Briefcase } from 'lucide-react';
 import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
 import { collection, addDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'; // Add sendEmailVerification
 import { useRouter } from 'next/navigation';
 import bcrypt from 'bcryptjs';
 
@@ -43,12 +43,13 @@ const OrganisationSignUpForm: React.FC = () => {
     try {
       setLoading(true);
       const hashedPassword = await bcrypt.hash(formData.password, 10);
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, hashedPassword);
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password); // Use the raw password
       await addDoc(collection(db, 'organizations'), {
         uid: userCredential.user.uid,
         ...formData,
         password: hashedPassword
       });
+      await sendEmailVerification(userCredential.user); // Send email verification
       console.log('Organization registered:', formData);
       router.push('/organisationDashboard'); // Replace '/organisationDashboard' with the actual path of the organization dashboard page
     } catch (err: any) {
@@ -79,7 +80,7 @@ const OrganisationSignUpForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="space-y-3 sm:space-y-4">
             <div className="relative">
-              <FiBriefcase className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="text"
@@ -95,7 +96,7 @@ const OrganisationSignUpForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="text"
@@ -111,7 +112,7 @@ const OrganisationSignUpForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="email"
@@ -127,7 +128,7 @@ const OrganisationSignUpForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="text"
@@ -143,7 +144,7 @@ const OrganisationSignUpForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type={showPassword ? "text" : "password"}
@@ -162,7 +163,7 @@ const OrganisationSignUpForm: React.FC = () => {
                   text-gray-400 hover:text-gray-300 text-lg sm:text-xl"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <FiEyeOff /> : <FiEye />}
+                {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
 

@@ -63,7 +63,7 @@ const SignUpForm: React.FC = () => {
         <div className="mb-6 sm:mb-8 text-center">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold 
             bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            NextGen Banking
+            FraudChain
           </h1>
           <p className="mt-2 text-xs sm:text-sm text-gray-400">
             Join Us for a Secure Future
