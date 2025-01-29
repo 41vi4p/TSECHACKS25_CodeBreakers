@@ -4,9 +4,7 @@ import React, { useState } from 'react';
 import { FiUser, FiMail, FiPhone, FiHome, FiFileText, FiCamera, FiLock } from 'react-icons/fi';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
-
-const auth = getAuth();
-const db = getFirestore();
+import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
 
 const SignUpForm: React.FC = () => {
   const [loading, setLoading] = useState(false);

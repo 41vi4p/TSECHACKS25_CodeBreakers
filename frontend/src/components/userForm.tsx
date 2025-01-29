@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { FiUser, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
+import { collection, addDoc } from 'firebase/firestore';
 
 const SignInForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -32,6 +34,7 @@ const SignInForm: React.FC = () => {
       setLoading(true);
       // TODO: Add your API call here
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      await addDoc(collection(db, 'signInData'), formData);
       console.log('Form submitted:', formData);
     } catch (err) {
       setError('Authentication failed. Please try again.');
