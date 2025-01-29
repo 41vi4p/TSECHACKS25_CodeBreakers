@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiUser, FiMail, FiPhone, FiHome, FiFileText, FiCamera, FiLock } from 'react-icons/fi';
+import { User, Mail, Phone, Home, FileText, Camera, Lock } from 'lucide-react';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
@@ -73,7 +73,7 @@ const SignUpForm: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div className="space-y-3 sm:space-y-4">
             <div className="relative">
-              <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="text"
@@ -89,7 +89,7 @@ const SignUpForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="text"
@@ -105,7 +105,7 @@ const SignUpForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiHome className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Home className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="text"
@@ -121,7 +121,7 @@ const SignUpForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="email"
@@ -137,7 +137,7 @@ const SignUpForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="password"
@@ -153,7 +153,7 @@ const SignUpForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <FiFileText className="absolute left-3 top-1/2 -translate-y-1/2 
+              <FileText className="absolute left-3 top-1/2 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type="text"
