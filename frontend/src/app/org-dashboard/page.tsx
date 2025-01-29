@@ -1,8 +1,11 @@
 import React from 'react'
+import OrgDashboard from '@/components/org-dashboard'
 
 const page = () => {
   return (
-    <div>page</div>
+    <div>
+      <OrgDashboard />
+    </div>
   )
 }
 
