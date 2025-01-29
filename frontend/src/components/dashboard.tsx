@@ -1,3 +1,4 @@
+'use client';
 import React, { useState } from 'react';
 import { Sun, Moon, Home, CreditCard, DollarSign, FileText, Settings, User, Wallet } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,18 +34,18 @@ const Dashboard = () => {
 
   return (
     <div className={`min-h-screen ${isDarkMode ? 'dark' : ''}`}>
-      <div className="flex h-screen bg-gray-100 dark:bg-[#1a1b2e]">
+      <div className="flex h-screen bg-gray-100 dark:bg-gray-800">
         {/* Sidebar */}
-        <div className="w-20 bg-white dark:bg-[#242639] border-r border-gray-200 dark:border-gray-700">
+        <div className="w-20 bg-white  border-r border-gray-200 dark:bg-gray-300">
           <div className="flex flex-col items-center h-full py-4">
             <div className="mb-8">
               <Avatar className="h-12 w-12">
-                <AvatarImage src="/company-logo.png" />
+                <AvatarImage src="/m.png" />
                 <AvatarFallback>NB</AvatarFallback>
               </Avatar>
             </div>
             
-            <nav className="flex-1 space-y-6">
+            <nav className="flex-col justify-center" >
               <Button variant="ghost" size="icon" className="w-12 h-12 text-gray-600 dark:text-gray-300">
                 <Home className="h-6 w-6" />
               </Button>
@@ -96,7 +97,7 @@ const Dashboard = () => {
           </header>
 
           {/* Dashboard Content */}
-          <main className="p-6">
+          <main className="p-6 flex-grow">
             {/* MetaMask Integration */}
             <Card className="mb-6 dark:bg-[#242639] dark:border-gray-700">
               <CardHeader>
