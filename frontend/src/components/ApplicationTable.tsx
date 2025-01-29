@@ -1,5 +1,7 @@
 'use client'
 import React, { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase"; // Adjust the import path as necessary
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -17,15 +19,18 @@ const ApplicationsTable: React.FC = () => {
   const [applicants, setApplicants] = useState<Applicant[]>([]);
 
   useEffect(() => {
-    // Fetch applicants from the database
+    // Fetch applicants from the Firestore database
     const fetchApplicants = async () => {
-      // Replace with your database fetching logic
-      const applicantsData = [
-        { id: 1, name: "Alice", loanType: "Home Loan", loanAmount: "₦1,000,000", duration: "5 years", score: 750, status: "Pending" },
-        { id: 2, name: "Bob", loanType: "Car Loan", loanAmount: "₦500,000", duration: "3 years", score: 680, status: "Pending" },
-        // Add more applicants as needed
-      ];
-      setApplicants(applicantsData);
+      try {
+        const querySnapshot = await getDocs(collection(db, "loanapplications"));
+        const applicantsData = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+        setApplicants(applicantsData);
+      } catch (error) {
+        console.error("Error fetching applicants: ", error);
+      }
     };
 
     fetchApplicants();
