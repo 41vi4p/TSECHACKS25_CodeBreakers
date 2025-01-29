@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { User, Lock, Eye, EyeOff, Mail, Phone, Briefcase } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, Mail, Phone, Briefcase, Percent, FileText } from 'lucide-react';
 import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
 import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'; // Add sendEmailVerification
@@ -107,7 +107,7 @@ export const OrganisationLoanForm: React.FC = () => {
           </div>
 
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 
+            <Percent className="absolute left-3 top-1/2 -translate-y-1/2 
               text-gray-400 text-lg sm:text-xl" />
             <input
               type="text"
@@ -123,7 +123,7 @@ export const OrganisationLoanForm: React.FC = () => {
           </div>
 
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 
+            <FileText className="absolute left-3 top-1/2 -translate-y-1/2 
               text-gray-400 text-lg sm:text-xl" />
             <input
               type="text"
@@ -139,7 +139,7 @@ export const OrganisationLoanForm: React.FC = () => {
           </div>
 
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 
+            <FileText className="absolute left-3 top-1/2 -translate-y-1/2 
               text-gray-400 text-lg sm:text-xl" />
             <input
               type="text"

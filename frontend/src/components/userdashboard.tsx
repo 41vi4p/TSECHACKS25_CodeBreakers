@@ -40,7 +40,7 @@ const Dashboard = () => {
 
   const userData = {
     name: "John Doe",
-    bankName: "NextGen Banking",
+    bankName: "FraudChain",
     loanId: "LOAN-2024-0123",
     accountType: "Premium",
     pendingInstallments: 3,
@@ -264,7 +264,7 @@ const Dashboard = () => {
           <footer className="mt-auto p-6 bg-gray-800/60 backdrop-blur-xl border-t border-gray-700">
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-400">
-                © 2025 NextGen Banking. All rights reserved.
+                © 2025 FraudChain by CodeBreakers. All rights reserved.
               </div>
               <div className="flex space-x-4">
                 <Button
@@ -273,12 +273,7 @@ const Dashboard = () => {
                 >
                   Support
                 </Button>
-                <Button
-                  variant="link"
-                  className="text-gray-400 hover:text-gray-300"
-                >
-                  Documentation
-                </Button>
+                
                 <Button
                   variant="link"
                   className="text-gray-400 hover:text-gray-300"
