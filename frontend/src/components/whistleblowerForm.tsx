@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { User, Mail, MessageSquare } from 'lucide-react';
+import { User, Mail, MessageSquare, Wallet } from 'lucide-react';
 import { db } from '@/lib/firebase'; // Adjust the import path as necessary
 import { collection, addDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,7 @@ const WhistleblowerForm: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    walletaddress: '',
     message: ''
   });
   const router = useRouter();
@@ -39,7 +40,7 @@ const WhistleblowerForm: React.FC = () => {
         timestamp: new Date()
       });
       console.log('Whistleblower report submitted:', formData);
-      router.push('/thankYou'); // Replace '/thankYou' with the actual path of the thank you page
+      router.push('/whistleblower'); // Replace '/thankYou' with the actual path of the thank you page
     } catch (err: any) {
       setError(`Submission failed: ${err.message}`);
       console.error('Error during submission:', err);
@@ -100,7 +101,23 @@ const WhistleblowerForm: React.FC = () => {
             </div>
 
             <div className="relative">
-              <MessageSquare className="absolute left-3 top-1/2 -translate-y-1/2 
+              <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 
+                text-gray-400 text-lg sm:text-xl" />
+              <input
+                type="text"
+                name="walletaddress"
+                value={formData.walletaddress}
+                onChange={handleChange}
+                placeholder="Wallet Address to receive incentive (optional)"
+                className="w-full pl-10 pr-4 py-2.5 sm:py-3 text-sm sm:text-base
+                  rounded-lg outline-none transition-all
+                  bg-gray-700/50 text-white focus:bg-gray-700/70
+                  border border-gray-600 focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="relative">
+              <MessageSquare className="absolute left-3 top-1/3 -translate-y-1/2 
                 text-gray-400 text-lg sm:text-xl" />
               <textarea
                 name="message"
@@ -111,7 +128,7 @@ const WhistleblowerForm: React.FC = () => {
                   rounded-lg outline-none transition-all
                   bg-gray-700/50 text-white focus:bg-gray-700/70
                   border border-gray-600 focus:ring-2 focus:ring-blue-500"
-                rows={4}
+                
               />
             </div>
           </div>
