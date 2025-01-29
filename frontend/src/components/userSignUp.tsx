@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { FiUser, FiMail, FiPhone, FiHome, FiFileText, FiCamera } from 'react-icons/fi';
+import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
+import { collection, addDoc } from 'firebase/firestore';
 
 const SignUpForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -39,9 +41,8 @@ const SignUpForm: React.FC = () => {
 
     try {
       setLoading(true);
-      // TODO: Add your API call here
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      console.log('Form submitted:', formData);
+      await addDoc(collection(db, 'users'), formData);
+      console.log('User added:', formData);
     } catch (err) {
       setError('Sign-up failed. Please try again.');
       console.error(err);
