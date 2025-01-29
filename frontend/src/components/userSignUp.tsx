@@ -5,6 +5,7 @@ import { FiUser, FiMail, FiPhone, FiHome, FiFileText, FiCamera, FiLock } from 'r
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
+import bcrypt from 'bcryptjs';
 
 const SignUpForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -36,9 +37,13 @@ const SignUpForm: React.FC = () => {
 
     try {
       setLoading(true);
+      const hashedPassword = await bcrypt.hash(formData.password, 10);
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       await sendEmailVerification(userCredential.user);
-      await addDoc(collection(db, 'users'), formData);
+      await addDoc(collection(db, 'users'), {
+        ...formData,
+        password: hashedPassword
+      });
       console.log('User added and verification email sent:', formData);
     } catch (err) {
       setError('Sign-up failed. Please try again.');
