@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 const ApplicationsTable: React.FC = () => {
   interface Applicant {
-    id: number;
+    id: string;
     name: string;
     loanType: string;
     loanAmount: string;
@@ -22,11 +22,20 @@ const ApplicationsTable: React.FC = () => {
     // Fetch applicants from the Firestore database
     const fetchApplicants = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "loanapplications"));
-        const applicantsData = querySnapshot.docs.map((doc) => ({
+        const querySnapshot = await getDocs(collection(db, 'applications'));
+        const applicantsData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
             id: doc.id,
-            ...doc.data(),
-          }));
+            name: data.name,
+            loanType: data.loanType,
+            loanAmount: data.loanAmount,
+            duration: data.duration,
+            score: data.score,
+            status: data.status,
+          };
+        });
+        console.log("Applicants data: ", applicantsData);
         setApplicants(applicantsData);
       } catch (error) {
         console.error("Error fetching applicants: ", error);
