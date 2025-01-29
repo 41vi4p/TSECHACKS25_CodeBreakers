@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { FiUser, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
 import { collection, addDoc } from 'firebase/firestore';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 const SignInForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -13,6 +15,7 @@ const SignInForm: React.FC = () => {
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -32,10 +35,10 @@ const SignInForm: React.FC = () => {
 
     try {
       setLoading(true);
-      // TODO: Add your API call here
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
       await addDoc(collection(db, 'signInData'), formData);
       console.log('Form submitted:', formData);
+      router.push('/newPage'); // Replace '/newPage' with the actual path of the new page
     } catch (err) {
       setError('Authentication failed. Please try again.');
       console.error(err);
@@ -124,11 +127,11 @@ const SignInForm: React.FC = () => {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
-          <div className="text-center mt-4">
+          {/* <div className="text-center mt-4">
             <a href="#" className="text-xs sm:text-sm text-blue-400 hover:text-blue-300">
               Forgot Password?
             </a>
-          </div>
+          </div> */}
         </form>
       </div>
     </div>
