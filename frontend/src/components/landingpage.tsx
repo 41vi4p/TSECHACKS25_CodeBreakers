@@ -11,6 +11,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Shield,
@@ -18,16 +19,13 @@ import {
   Brain,
   UserCheck,
   UserPlus, FileSearch, CheckCircle, Bell
-  Facebook,
   Twitter,
   LinkedinIcon as LinkedIn,
   GitlabIcon as GitHub,
+  Lock, 
+  FileCheck,
 } from "lucide-react";
 import Link from "next/link";
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield, Lock, FileCheck } from "lucide-react"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 
 export function CTA() {
@@ -263,11 +261,6 @@ export  function Footer() {
             &copy; 2023 RiskChain. All rights reserved.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link
-              href="#"
-              className="text-muted-foreground hover:text-foreground">
-              <Facebook className="h-5 w-5" />
-            </Link>
             <Link
               href="#"
               className="text-muted-foreground hover:text-foreground">
