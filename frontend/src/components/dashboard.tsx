@@ -1,15 +1,42 @@
-'use client';
-import React, { useState } from 'react';
-import { Sun, Moon, Home, CreditCard, DollarSign, FileText, Settings, User, Wallet } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from "react";
+import {
+  Home,
+  CreditCard,
+  DollarSign,
+  FileText,
+  Settings,
+  User,
+  Wallet,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { ethers } from "ethers";
+import LoanManagement from "../../../artifacts/contracts/FraudChain.sol/LoanManagement.json";
 
 const Dashboard = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  useEffect(() => {
+    const initializeMetaMask = async () => {
+      if (typeof window !== "undefined") {
+        const { MetaMaskSDK } = await import("@metamask/sdk");
+        MMSDK = new MetaMaskSDK({
+          dappMetadata: {
+            name: "Loan Application Dapp",
+            url: window.location.href,
+          },
+        });
+      }
+    };
+
+    initializeMetaMask();
+  }, []);
+
+  let MMSDK: any = null;
+
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
+  const [walletAddress, setWalletAddress] = useState("");
 
   const userData = {
     name: "John Doe",
@@ -19,16 +46,19 @@ const Dashboard = () => {
     pendingInstallments: 3,
     totalLoanAmount: "₦2,500,000",
     nextPayment: "₦125,000",
-    dueDate: "Feb 15, 2025"
+    dueDate: "Feb 15, 2025",
   };
 
   const connectWallet = async () => {
-    const conn = true;
-    if (conn == true) {
-      alert("Wallet connected successfully!");
-    } else {
-      alert("Please install MetaMask!");
-    }
+    const ethereum = MMSDK.getProvider();
+    const provider = new ethers.BrowserProvider(ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(
+      "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      LoanManagement.abi,
+      signer
+    );
+    setIsWalletConnected(true);
   };
 
   return (
@@ -43,27 +73,51 @@ const Dashboard = () => {
                 <AvatarFallback>NB</AvatarFallback>
               </Avatar>
             </div>
-            
-            <nav className="flex-col justify-center space-y-4">
-              <Button variant="ghost" size="icon" className="w-12 h-12 text-gray-300 hover:bg-gray-700/50">
+
+            <nav className="flex-col flex justify-center space-y-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
+              >
                 <Home className="h-6 w-6" />
               </Button>
-              <Button variant="ghost" size="icon" className="w-12 h-12 text-gray-300 hover:bg-gray-700/50">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
+              >
                 <CreditCard className="h-6 w-6" />
               </Button>
-              <Button variant="ghost" size="icon" className="w-12 h-12 text-gray-300 hover:bg-gray-700/50">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
+              >
                 <DollarSign className="h-6 w-6" />
               </Button>
-              <Button variant="ghost" size="icon" className="w-12 h-12 text-gray-300 hover:bg-gray-700/50">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
+              >
                 <FileText className="h-6 w-6" />
               </Button>
             </nav>
 
-            <div className="mt-auto space-y-4">
-              <Button variant="ghost" size="icon" className="w-12 h-12 text-gray-300 hover:bg-gray-700/50">
+            <div className="mt-auto flex flex-col space-y-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
+              >
                 <Settings className="h-6 w-6" />
               </Button>
-              <Button variant="ghost" size="icon" className="w-12 h-12 text-gray-300 hover:bg-gray-700/50">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
+              >
                 <User className="h-6 w-6" />
               </Button>
             </div>
@@ -71,7 +125,7 @@ const Dashboard = () => {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-auto">
+        <div className=" flex w-full flex-col overflow-auto">
           {/* Header */}
           <header className="bg-gray-800/60 backdrop-blur-xl">
             <div className="px-6 py-4">
@@ -82,15 +136,6 @@ const Dashboard = () => {
                   </h1>
                   <p className="text-gray-400">{userData.bankName}</p>
                 </div>
-                <div className="flex items-center space-x-4">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsDarkMode(!isDarkMode)}
-                    className="border-gray-700 text-gray-300 hover:bg-gray-700/50"
-                  >
-                    {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                  </Button>
-                </div>
               </div>
             </div>
           </header>
@@ -100,7 +145,9 @@ const Dashboard = () => {
             {/* MetaMask Integration */}
             <Card className="mb-6 bg-gray-800/60 backdrop-blur-xl border-gray-700">
               <CardHeader>
-                <CardTitle className="text-gray-300">Wallet Connection</CardTitle>
+                <CardTitle className="text-gray-300">
+                  Wallet Connection
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
@@ -109,21 +156,30 @@ const Dashboard = () => {
                     <div>
                       {isWalletConnected ? (
                         <div>
-                          <p className="text-sm text-gray-400">Connected Wallet</p>
+                          <p className="text-sm text-gray-400">
+                            Connected Wallet
+                          </p>
                           <p className="font-mono text-sm text-gray-300">
-                            {`${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
+                            {`${walletAddress.slice(
+                              0,
+                              6
+                            )}...${walletAddress.slice(-4)}`}
                           </p>
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-400">No wallet connected</p>
+                        <p className="text-sm text-gray-400">
+                          No wallet connected
+                        </p>
                       )}
                     </div>
                   </div>
-                  <Button 
+                  <Button
                     onClick={connectWallet}
                     className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transform transition-all duration-200 hover:scale-[1.02]"
                   >
-                    {isWalletConnected ? 'Disconnect Wallet' : 'Connect MetaMask'}
+                    {isWalletConnected
+                      ? "Disconnect Wallet"
+                      : "Connect MetaMask"}
                   </Button>
                 </div>
               </CardContent>
@@ -145,7 +201,9 @@ const Dashboard = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Total Amount</span>
-                      <span className="text-gray-300">{userData.totalLoanAmount}</span>
+                      <span className="text-gray-300">
+                        {userData.totalLoanAmount}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -161,7 +219,9 @@ const Dashboard = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-gray-400">Amount Due</span>
-                      <span className="text-gray-300">{userData.nextPayment}</span>
+                      <span className="text-gray-300">
+                        {userData.nextPayment}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Due Date</span>
@@ -186,8 +246,12 @@ const Dashboard = () => {
                       </Badge>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Pending Installments</span>
-                      <span className="text-gray-300">{userData.pendingInstallments}</span>
+                      <span className="text-gray-400">
+                        Pending Installments
+                      </span>
+                      <span className="text-gray-300">
+                        {userData.pendingInstallments}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -202,9 +266,24 @@ const Dashboard = () => {
                 © 2025 NextGen Banking. All rights reserved.
               </div>
               <div className="flex space-x-4">
-                <Button variant="link" className="text-gray-400 hover:text-gray-300">Support</Button>
-                <Button variant="link" className="text-gray-400 hover:text-gray-300">Documentation</Button>
-                <Button variant="link" className="text-gray-400 hover:text-gray-300">Terms</Button>
+                <Button
+                  variant="link"
+                  className="text-gray-400 hover:text-gray-300"
+                >
+                  Support
+                </Button>
+                <Button
+                  variant="link"
+                  className="text-gray-400 hover:text-gray-300"
+                >
+                  Documentation
+                </Button>
+                <Button
+                  variant="link"
+                  className="text-gray-400 hover:text-gray-300"
+                >
+                  Terms
+                </Button>
               </div>
             </div>
           </footer>
