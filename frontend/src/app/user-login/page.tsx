@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import SignInForm from "@/components/userForm";
 
 const page = () => {
   return (
-    <div>page</div>
-  )
-}
+    <div>
+      <SignInForm />
+    </div>
+  );
+};
 
-export default page
+export default page;
