@@ -1,6 +1,6 @@
 import Post from "./Post"
 
-const posts = [
+export const posts = [
   {
     id: 1,
     title: "Ethereum 2.0: The Future of Scalability",
