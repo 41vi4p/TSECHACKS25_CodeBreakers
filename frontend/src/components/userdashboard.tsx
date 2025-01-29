@@ -8,6 +8,7 @@ import {
   Settings,
   User,
   Wallet,
+  IndianRupee,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ const Dashboard = () => {
     name: "John Doe",
     bankName: "FraudChain",
     loanId: "LOAN-2024-0123",
-    accountType: "Premium",
+    accountType: "85",
     pendingInstallments: 3,
     totalLoanAmount: "₦2,500,000",
     nextPayment: "₦125,000",
@@ -241,8 +242,8 @@ const Dashboard = () => {
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400">Type</span>
-                      <Badge className="bg-blue-500/20 text-blue-400">
+                      <span className="text-gray-400 font-bold">Loan Score</span>
+                      <Badge className="bg-blue-500/20 text-green-400">
                         {userData.accountType}
                       </Badge>
                     </div>
@@ -257,7 +258,41 @@ const Dashboard = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              
             </div>
+            <Card className="mb-6 bg-gray-800/60 backdrop-blur-xl border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-gray-300">
+                  Pay Installment
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <IndianRupee className="h-8 w-8 text-gray-300" />
+                    <div>
+  
+                        <div>
+                          <p className="text-sm text-gray-400">
+                            Pay Now
+                          </p>
+                          <p className="font-mono text-sm text-gray-300">
+                            {}
+                          </p>
+                        </div>
+                      
+                    </div>
+                  </div>
+                  <Button
+                    onClick={connectWallet}
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transform transition-all duration-200 hover:scale-[1.02]"
+                  >
+                    Pay Now
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </main>
 
           {/* Footer */}
