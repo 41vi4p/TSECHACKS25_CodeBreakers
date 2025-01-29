@@ -2,12 +2,11 @@
 
 import React, { useState } from 'react';
 import { FiUser, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
-import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
-import { collection, addDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase'; // Adjust the import path as necessary
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
-const SignInForm: React.FC = () => {
+const OrganisationLoginForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -36,9 +35,8 @@ const SignInForm: React.FC = () => {
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      await addDoc(collection(db, 'signInData'), formData);
-      console.log('Form submitted:', formData);
-      router.push('/newPage'); // Replace '/newPage' with the actual path of the new page
+      console.log('Organisation login successful:', formData);
+      router.push('/organisationDashboard'); // Replace '/organisationDashboard' with the actual path of the organization dashboard page
     } catch (err) {
       setError('Authentication failed. Please try again.');
       console.error(err);
@@ -57,10 +55,10 @@ const SignInForm: React.FC = () => {
         <div className="mb-6 sm:mb-8 text-center">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold 
             bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            NextGen Banking
+            Organisation Login
           </h1>
           <p className="mt-2 text-xs sm:text-sm text-gray-400">
-            Secure Access to Your Future
+            Secure Access to Organisation Dashboard
           </p>
         </div>
 
@@ -87,15 +85,14 @@ const SignInForm: React.FC = () => {
                 text-gray-400 text-lg sm:text-xl" />
               <input
                 type={showPassword ? "text" : "password"}
-                
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Password"
                 className="w-full pl-10 pr-12 py-2.5 sm:py-3 text-sm sm:text-base
                   rounded-lg outline-none transition-all
-                  bg-gray-700/50 text-white
-                  border border-gray-600 "
+                  bg-gray-700/50 text-white focus:bg-gray-700/70
+                  border border-gray-600 focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="button"
@@ -127,16 +124,10 @@ const SignInForm: React.FC = () => {
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
-
-          {/* <div className="text-center mt-4">
-            <a href="#" className="text-xs sm:text-sm text-blue-400 hover:text-blue-300">
-              Forgot Password?
-            </a>
-          </div> */}
         </form>
       </div>
     </div>
   );
 };
 
-export default SignInForm;
+export default OrganisationLoginForm;
