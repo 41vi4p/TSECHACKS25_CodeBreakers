@@ -174,6 +174,9 @@ const Dashboard = () => {
                 variant="ghost"
                 size="icon"
                 className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
+                onClick={() => {
+                  router.push("/apply-loan");
+                }}
               >
                 <DollarSign className="h-6 w-6" />
               </Button>
