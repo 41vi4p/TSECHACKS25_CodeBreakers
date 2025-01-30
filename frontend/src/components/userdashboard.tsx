@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ethers } from "ethers";
-import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
 import { useRouter } from 'next/navigation';
 
@@ -91,10 +91,17 @@ const Dashboard = () => {
       // Reset the timer to 30 days
       const nextDueDate = new Date();
       nextDueDate.setDate(nextDueDate.getDate() + 30);
+      const updatedPendingInstallments = userData.pendingInstallments - 1;
       setUserData({
         ...userData,
         dueDate: nextDueDate.toDateString(),
         nextPayment: " ₹0",
+        pendingInstallments: updatedPendingInstallments,
+      });
+      // Update pending installments in the database
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+      await updateDoc(userDocRef, {
+        pendingInstallments: updatedPendingInstallments,
       });
     } catch (error) {
       console.error('Error adding transaction:', error);

@@ -25,6 +25,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase'; // Adjust the import path as necessary
 
 ChartJS.register(
   CategoryScale,
@@ -37,6 +39,8 @@ ChartJS.register(
 );
 
 const BankDashboard = () => {
+  const [whistleblowerReports, setWhistleblowerReports] = useState<any[]>([]);
+  
   const [applicants, setApplicants] = useState<
     { id: number; name: string; loanAmount: string; status: string }[]
   >([]);
@@ -77,14 +81,28 @@ const BankDashboard = () => {
     const fetchApplicants = async () => {
       // Replace with your database fetching logic
       const applicantsData = [
-        { id: 1, name: "Alice", loanAmount: "₦1,000,000", status: "Pending" },
-        { id: 2, name: "Bob", loanAmount: "₦500,000", status: "Pending" },
+        { id: 1, name: "Alice", loanAmount: "₹1,000,000", status: "Pending" },
+        { id: 2, name: "Bob", loanAmount: "₹500,000", status: "Pending" },
         // Add more applicants as needed
       ];
       setApplicants(applicantsData);
     };
 
     fetchApplicants();
+  }, []);
+
+  useEffect(() => {
+    const fetchWhistleblowerReports = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'whistleblowerReports'));
+        const reports = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        setWhistleblowerReports(reports);
+      } catch (err) {
+        console.error('Error fetching whistleblower reports:', err.message);
+      }
+    };
+
+    fetchWhistleblowerReports();
   }, []);
 
   const handleSelectApplicant = (applicant: {
@@ -157,7 +175,7 @@ const BankDashboard = () => {
                   <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                     Welcome to the Bank Dashboard
                   </h1>
-                  <p className="text-gray-400">NextGen Banking</p>
+                  <p className="text-gray-400">FraudChain</p>
                 </div>
               </div>
             </div>
@@ -292,13 +310,31 @@ const BankDashboard = () => {
                 <Line data={sanctionedLoansData} />
               </CardContent>
             </Card>
+                    <br></br>
+            <Card className="bg-gray-800/60 flex flex-col w-full justify-center items-center backdrop-blur-xl border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-gray-300">
+                 Anonymous Reports
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="min-w-[68%]  ">
+                <div className="space-y-4">
+                  {whistleblowerReports.map((report) => (
+                    <div key={report.id} className="p-4 bg-gray-700/50 rounded-lg">
+                      <p className="text-sm text-gray-300">{report.message}</p>
+                      <p className="text-xs text-gray-400 mt-2">{report.timestamp}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </main>
 
           {/* Footer */}
           <footer className="mt-auto p-6 bg-gray-800/60 backdrop-blur-xl border-t border-gray-700">
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-400">
-                © 2025 NextGen Banking. All rights reserved.
+                © 2025 FraudChain. All rights reserved.
               </div>
               <div className="flex space-x-4">
                 <Button
@@ -307,12 +343,7 @@ const BankDashboard = () => {
                 >
                   Support
                 </Button>
-                <Button
-                  variant="link"
-                  className="text-gray-400 hover:text-gray-300"
-                >
-                  Documentation
-                </Button>
+
                 <Button
                   variant="link"
                   className="text-gray-400 hover:text-gray-300"
