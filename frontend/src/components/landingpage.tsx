@@ -70,7 +70,7 @@ const LandingPage = () => {
               Contact Support
             </a>
             <a href="#" className="text-blue-400 hover:text-blue-300">
-              <a href="#" className="text-blue-400 ml-4 font-bold hover:text-blue-300">
+              <a href="wistlleblower" className="text-blue-400 ml-4 font-bold hover:text-blue-300">
               Whistleblower
             </a>
             </a>
