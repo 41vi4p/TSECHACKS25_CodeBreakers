@@ -37,7 +37,7 @@ const WhistleblowerForm: React.FC = () => {
       setLoading(true);
       await addDoc(collection(db, 'whistleblowerReports'), {
         ...formData,
-        timestamp: new Date()
+        timestamp: (new Date()).toString()
       });
       console.log('Whistleblower report submitted:', formData);
       router.push('/whistleblower'); // Replace '/thankYou' with the actual path of the thank you page

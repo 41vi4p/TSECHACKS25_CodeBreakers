@@ -15,10 +15,13 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase'; // Adjust the import path as necessary
 
 const OrgDashboard = () => {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
+  const [whistleblowerReports, setWhistleblowerReports] = useState<any[]>([]);
 
   const orgData = {
     name: 'TechCorp',
@@ -37,6 +40,20 @@ const OrgDashboard = () => {
     { month: 'Jun', revenue: 2390, expenses: 3800 },
     { month: 'Jul', revenue: 3490, expenses: 4300 },
   ];
+
+  useEffect(() => {
+    const fetchWhistleblowerReports = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'whistleblowerReports'));
+        const reports = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        setWhistleblowerReports(reports);
+      } catch (err) {
+        console.error('Error fetching whistleblower reports:', err.message);
+      }
+    };
+
+    fetchWhistleblowerReports();
+  }, []);
 
   const connectWallet = async () => {
     // Implement wallet connection logic here
@@ -200,7 +217,7 @@ const OrgDashboard = () => {
             </div>
 
             {/* Revenue vs Expenses Graph */}
-            <Card className="bg-gray-800/60 backdrop-blur-xl border-gray-700">
+            <Card className="bg-gray-800/60 backdrop-blur-xl border-gray-700 mb-6">
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-gray-300">
                   Revenue vs Expenses
@@ -219,13 +236,32 @@ const OrgDashboard = () => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+
+            {/* Whistleblower Reports */}
+            <Card className="bg-gray-800/60 backdrop-blur-xl border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-sm font-medium text-gray-300">
+                  Anonymous Reports
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {whistleblowerReports.map((report) => (
+                    <div key={report.id} className="p-4 bg-gray-700/50 rounded-lg">
+                      <p className="text-sm text-gray-300">{report.message}</p>
+                      <p className="text-xs text-gray-400 mt-2">{new Date(report.timestamp).toLocaleString()}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </main>
 
           {/* Footer */}
           <footer className="mt-auto p-6 bg-gray-800/60 backdrop-blur-xl border-t border-gray-700">
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-400">
-                © 2025 TechCorp. All rights reserved.
+                © 2025 FraudChain. All rights reserved.
               </div>
               <div className="flex space-x-4">
                 <Button
