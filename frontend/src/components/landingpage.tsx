@@ -59,6 +59,7 @@ const LandingPage = () => {
                 </button>
               </Link> 
             </div>
+
           </div>
         </div>
 
@@ -67,6 +68,11 @@ const LandingPage = () => {
             Need help?{" "}
             <a href="#" className="text-blue-400 hover:text-blue-300">
               Contact Support
+            </a>
+            <a href="#" className="text-blue-400 hover:text-blue-300">
+              <a href="#" className="text-blue-400 ml-4 font-bold hover:text-blue-300">
+              Whistleblower
+            </a>
             </a>
           </p>
         </div>
