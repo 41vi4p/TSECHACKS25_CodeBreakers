@@ -228,7 +228,7 @@ const BankDashboard = () => {
                     <div>
                       <p className="text-sm text-gray-400">Connected Wallet</p>
                       <p className="font-mono text-sm text-gray-300">
-                        {`${account.slice(0, 4)}...${account.slice(-4)}`}
+                        {`${account.slice(0, 6)}...${account.slice(-4)}`}
                       </p>
                     </div>
                   ) : (
