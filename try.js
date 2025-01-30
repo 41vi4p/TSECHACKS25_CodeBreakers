@@ -6,7 +6,7 @@ const web3 = new Web3(new Web3.providers.HttpProvider("http://192.168.0.158:8545
 
 // Neo4j Connection
 const driver = neo4j.driver(
-    "neo4j://localhost:7687",
+    "bolt://localhost:7687",
     neo4j.auth.basic("neo4j", "admin@123")
 );
 
