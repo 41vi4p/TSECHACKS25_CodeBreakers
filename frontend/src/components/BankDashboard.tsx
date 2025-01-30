@@ -13,15 +13,64 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Line } from "react-chartjs-2";
+import { ethers } from "ethers";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const BankDashboard = () => {
-  const [applicants, setApplicants] = useState<{ id: number; name: string; loanAmount: string; status: string; }[]>([]);
-  const [selectedApplicant, setSelectedApplicant] = useState<{ id: number; name: string; loanAmount: string; status: string; } | null>(null);
-  const [approvedApplications, setApprovedApplications] = useState<{ id: number; name: string; loanAmount: string; status: string; }[]>([]);
+  const [applicants, setApplicants] = useState<
+    { id: number; name: string; loanAmount: string; status: string }[]
+  >([]);
+  const [selectedApplicant, setSelectedApplicant] = useState<{
+    id: number;
+    name: string;
+    loanAmount: string;
+    status: string;
+  } | null>(null);
+  const [approvedApplications, setApprovedApplications] = useState<
+    { id: number; name: string; loanAmount: string; status: string }[]
+  >([]);
+
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [account, setAccount] = useState("");
+  const [error, setError] = useState("");
+
+  let MMSDK: any = null;
+
+  useEffect(() => {
+    const initializeMetaMask = async () => {
+      if (typeof window !== "undefined") {
+        const { MetaMaskSDK } = await import("@metamask/sdk");
+        MMSDK = new MetaMaskSDK({
+          dappMetadata: {
+            name: "Loan Application Dapp",
+            url: window.location.href,
+          },
+        });
+      }
+    };
+    initializeMetaMask();
+  }, []);
 
   useEffect(() => {
     // Fetch applicants from the database
@@ -38,13 +87,21 @@ const BankDashboard = () => {
     fetchApplicants();
   }, []);
 
-  const handleSelectApplicant = (applicant: { id: number; name: string; loanAmount: string; status: string; }) => {
+  const handleSelectApplicant = (applicant: {
+    id: number;
+    name: string;
+    loanAmount: string;
+    status: string;
+  }) => {
     setSelectedApplicant(applicant);
   };
 
   const handleApprove = () => {
     if (selectedApplicant) {
-      setApprovedApplications([...approvedApplications, { ...selectedApplicant, status: "Approved" }]);
+      setApprovedApplications([
+        ...approvedApplications,
+        { ...selectedApplicant, status: "Approved" },
+      ]);
       setSelectedApplicant(null);
     }
   };
@@ -56,81 +113,36 @@ const BankDashboard = () => {
   };
 
   const sanctionedLoansData = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+    labels: ["January", "February", "March", "April", "May", "June"],
     datasets: [
       {
-        label: 'Sanctioned Loans',
+        label: "Sanctioned Loans",
         data: [1200000, 1500000, 1000000, 2000000, 2500000, 3000000],
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
       },
     ],
+  };
+
+  const connectWallet = async () => {
+    try {
+      setError("");
+      if (!MMSDK) throw new Error("MetaMask SDK not initialized");
+      const ethereum = MMSDK.getProvider();
+      if (!ethereum) throw new Error("Please install MetaMask");
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      if (accounts[0]) setAccount(accounts[0]);
+    } catch (err) {
+      setError(err.message || "Failed to connect wallet");
+    }
+    setIsWalletConnected(true);
   };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
       <div className="flex h-screen">
-        {/* Sidebar */}
-    {/*    
-    <div className="w-20 bg-gray-800/60 backdrop-blur-xl border-r border-gray-700">
-          <div className="flex flex-col items-center h-full py-4">
-            <div className="mb-8">
-              <Avatar className="h-12 w-12">
-                <AvatarImage src="/m.png" />
-                <AvatarFallback>NB</AvatarFallback>
-              </Avatar>
-            </div>
-
-            <nav className="flex-col flex justify-center space-y-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
-              >
-                <Home className="h-6 w-6" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
-              >
-                <CreditCard className="h-6 w-6" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
-              >
-                <DollarSign className="h-6 w-6" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
-              >
-                <FileText className="h-6 w-6" />
-              </Button>
-            </nav>
-
-            <div className="mt-auto flex flex-col space-y-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
-              >
-                <Settings className="h-6 w-6" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12 text-gray-300 hover:bg-gray-700/50"
-              >
-                <User className="h-6 w-6" />
-              </Button>
-            </div>
-          </div>
-        </div>
-*/}
         {/* Main Content */}
         <div className="flex w-full flex-col overflow-auto">
           {/* Header */}
@@ -144,6 +156,29 @@ const BankDashboard = () => {
                   <p className="text-gray-400">NextGen Banking</p>
                 </div>
               </div>
+            </div>
+            <div className="flex items-center justify-between pr-4 pl-4 mb-4">
+              <div className="flex items-center space-x-4">
+                <Wallet className="h-8 w-8 text-gray-300" />
+                <div>
+                  {isWalletConnected ? (
+                    <div>
+                      <p className="text-sm text-gray-400">Connected Wallet</p>
+                      <p className="font-mono text-sm text-gray-300">
+                        {`${account.slice(0, 4)}...${account.slice(-4)}`}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-400"></p>
+                  )}
+                </div>
+              </div>
+              <Button
+                onClick={connectWallet}
+                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transform transition-all duration-200 hover:scale-[1.02]"
+              >
+                {isWalletConnected ? "Disconnect Wallet" : "Connect MetaMask"}
+              </Button>
             </div>
           </header>
 
@@ -184,15 +219,21 @@ const BankDashboard = () => {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-gray-400">Name</span>
-                        <span className="text-gray-300">{selectedApplicant.name}</span>
+                        <span className="text-gray-300">
+                          {selectedApplicant.name}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Loan Amount</span>
-                        <span className="text-gray-300">{selectedApplicant.loanAmount}</span>
+                        <span className="text-gray-300">
+                          {selectedApplicant.loanAmount}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Status</span>
-                        <span className="text-gray-300">{selectedApplicant.status}</span>
+                        <span className="text-gray-300">
+                          {selectedApplicant.status}
+                        </span>
                       </div>
                       <div className="flex space-x-4 mt-4">
                         <Button
@@ -210,7 +251,9 @@ const BankDashboard = () => {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-gray-400">Select an applicant to view details</p>
+                    <p className="text-gray-400">
+                      Select an applicant to view details
+                    </p>
                   )}
                 </CardContent>
               </Card>
@@ -235,13 +278,13 @@ const BankDashboard = () => {
             </div>
 
             {/* Sanctioned Loans Graph */}
-            <Card className="bg-gray-800/60 backdrop-blur-xl border-gray-700">
+            <Card className="bg-gray-800/60 flex flex-col w-full justify-center items-center backdrop-blur-xl border-gray-700">
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-gray-300">
                   Sanctioned Loans
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="min-w-[68%]  ">
                 <Line data={sanctionedLoansData} />
               </CardContent>
             </Card>

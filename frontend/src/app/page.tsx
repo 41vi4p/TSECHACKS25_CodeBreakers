@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import Link from "next/link";
 
 // export default function Home() {
@@ -36,3 +37,14 @@ getDocs(colRef)
     console.log(err.message);
   });
 }, []);
+=======
+import LandingPage from "@/components/landingpage";
+
+export default function Home() {
+  return (
+    <div className="">
+      <LandingPage />
+    </div>
+  );
+}
+>>>>>>> 4f77303be7bdca64acd2d281d6e479e841ec46a4

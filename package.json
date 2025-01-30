@@ -1,9 +1,11 @@
 {
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "ReentrancyGuard.sol": "link:@openzeppelin/contracts/security/ReentrancyGuard.sol",
     "hardhat": "^2.22.18"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
     "bcryptjs": "^2.4.3",
     "firebase": "^10.12.4",
     "neo4j-driver": "^5.27.0",
