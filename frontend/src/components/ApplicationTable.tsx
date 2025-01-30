@@ -4,7 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase"; // Adjust the import path as necessary
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
+import Link from "next/link";
 const ApplicationsTable: React.FC = () => {
   interface Applicant {
     id: string;
@@ -50,6 +50,7 @@ const ApplicationsTable: React.FC = () => {
     const selectedApplicant = applicant.id;
     sessionStorage.setItem("selectedApplicant", selectedApplicant);
     console.log("Selected applicant:", applicant);
+    
   };
 
   return (
@@ -89,7 +90,7 @@ const ApplicationsTable: React.FC = () => {
                       onClick={() => handleSelectApplicant(applicant)}
                       className="bg-blue-500 hover:bg-blue-600 text-white"
                     >
-                      Review
+                      <Link href={'/org-dashboard?tab=credit'}> Review</Link>
                     </Button>
                   </td>
                 </tr>

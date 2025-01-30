@@ -1,13 +1,30 @@
-"use client"
-import React, { useState } from 'react';
+"use client";
+import React, { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import BankDashboard from '@/components/BankDashboard';
 import ApplicationsTable from '@/components/ApplicationTable';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { CreditCard, DollarSign, FileText, Home, Settings, User } from "lucide-react";
 import ApplicationReview from '@/components/ApplicationReview';
+
 const Page = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('home');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    router.push(`?tab=${tab}`);
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
@@ -37,7 +54,7 @@ const Page = () => {
               variant="ghost"
               size="icon"
               className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'home' ? 'bg-gray-700/50' : ''}`}
-              onClick={() => setActiveTab('home')}
+              onClick={() => handleTabChange('home')}
             >
               <Home className="h-6 w-6" />
             </Button>
@@ -45,7 +62,7 @@ const Page = () => {
               variant="ghost"
               size="icon"
               className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'credit' ? 'bg-gray-700/50' : ''}`}
-              onClick={() => setActiveTab('credit')}
+              onClick={() => handleTabChange('credit')}
             >
               <CreditCard className="h-6 w-6" />
             </Button>
@@ -53,7 +70,7 @@ const Page = () => {
               variant="ghost"
               size="icon"
               className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'dollar' ? 'bg-gray-700/50' : ''}`}
-              onClick={() => setActiveTab('dollar')}
+              onClick={() => handleTabChange('dollar')}
             >
               <DollarSign className="h-6 w-6" />
             </Button>
@@ -61,7 +78,7 @@ const Page = () => {
               variant="ghost"
               size="icon"
               className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'applications' ? 'bg-gray-700/50' : ''}`}
-              onClick={() => setActiveTab('applications')}
+              onClick={() => handleTabChange('applications')}
             >
               <FileText className="h-6 w-6" />
             </Button>
@@ -72,7 +89,7 @@ const Page = () => {
               variant="ghost"
               size="icon"
               className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'settings' ? 'bg-gray-700/50' : ''}`}
-              onClick={() => setActiveTab('settings')}
+              onClick={() => handleTabChange('settings')}
             >
               <Settings className="h-6 w-6" />
             </Button>
@@ -80,7 +97,7 @@ const Page = () => {
               variant="ghost"
               size="icon"
               className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'user' ? 'bg-gray-700/50' : ''}`}
-              onClick={() => setActiveTab('user')}
+              onClick={() => handleTabChange('user')}
             >
               <User className="h-6 w-6" />
             </Button>
