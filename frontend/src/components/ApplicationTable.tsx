@@ -47,6 +47,8 @@ const ApplicationsTable: React.FC = () => {
 
   const handleSelectApplicant = (applicant: Applicant) => {
     // Logic to handle selecting an applicant and redirecting to the application review tab
+    const selectedApplicant = applicant.id;
+    sessionStorage.setItem("selectedApplicant", selectedApplicant);
     console.log("Selected applicant:", applicant);
   };
 
