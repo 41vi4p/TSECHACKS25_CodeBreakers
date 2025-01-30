@@ -38,7 +38,7 @@ const SignInForm: React.FC = () => {
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       await addDoc(collection(db, 'signInData'), formData);
       console.log('Form submitted:', formData);
-      router.push('/newPage'); // Replace '/newPage' with the actual path of the new page
+      router.push('/user-dashboard'); // Replace '/newPage' with the actual path of the new page
     } catch (err) {
       setError("Authentication failed. Please try again.");
       console.error(err);

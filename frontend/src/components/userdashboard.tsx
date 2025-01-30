@@ -15,9 +15,18 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ethers } from "ethers";
-//import LoanManagement from "../../../artifacts/contracts/FraudChain.sol/LoanManagement.json";
+import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
+import { useRouter } from 'next/navigation';
 
 const Dashboard = () => {
+  const router = useRouter();
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [userData, setUserData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [successMessage, setSuccessMessage] = useState("");
+
   useEffect(() => {
     const initializeMetaMask = async () => {
       if (typeof window !== "undefined") {
@@ -31,37 +40,74 @@ const Dashboard = () => {
       }
     };
 
+    const fetchUserData = async () => {
+      if (auth.currentUser) {
+        try {
+          const querySnapshot = await getDocs(collection(db, 'users'));
+          const userDocs = querySnapshot.docs.map((doc) => doc.data());
+          const userIndex = userDocs.findIndex(user => user.email === auth.currentUser.email);
+          if (userIndex !== -1) {
+            console.log('User data fetched:', userDocs[userIndex]);
+            setUserData(userDocs[userIndex]);
+          } else {
+            router.push('/user-login'); // Redirect to login if not authenticated
+          }
+        } catch (err) {
+          console.error('Error fetching user data:', err.message);
+        }
+      } else {
+        router.push('/user-login'); // Redirect to login if not authenticated
+      }
+      setLoading(false);
+    };
+
     initializeMetaMask();
-  }, []);
+    fetchUserData();
+  }, [router]);
 
   let MMSDK: any = null;
-
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
-
-  const userData = {
-    name: "John Doe",
-    bankName: "FraudChain",
-    loanId: "LOAN-2024-0123",
-    accountType: "85",
-    pendingInstallments: 3,
-    totalLoanAmount: "₦2,500,000",
-    nextPayment: "₦125,000",
-    dueDate: "Feb 15, 2025",
-  };
 
   const connectWallet = async () => {
     const ethereum = MMSDK.getProvider();
     const provider = new ethers.BrowserProvider(ethereum);
     const signer = await provider.getSigner();
-   // const contract = new ethers.Contract(
-     // "//0x5FbDB2315678afecb367f032d93F642f64180aa3",
-     // LoanManagement.abi,
-     // signer
-   // );
     setIsWalletConnected(true);
     setWalletAddress((await signer.getAddress()).toString());
   };
+
+  const handlePayNow = async () => {
+    try {
+      const timestamp = new Date().toISOString();
+      await addDoc(collection(db, 'transactions'), {
+        userId: auth.currentUser?.uid,
+        userName: userData.name,
+        loanId: userData.loanId,
+        amountPaid: userData.nextPayment,
+        timestamp,
+      });
+      console.log('Transaction added:', { userId: auth.currentUser?.uid, timestamp });
+      setSuccessMessage("Transaction successful! Next payment due in 30 days.");
+      setTimeout(() => setSuccessMessage(""), 5000); // Clear message after 5 seconds
+      // Reset the timer to 30 days
+      const nextDueDate = new Date();
+      nextDueDate.setDate(nextDueDate.getDate() + 30);
+      setUserData({
+        ...userData,
+        dueDate: nextDueDate.toDateString(),
+        nextPayment: " ₹0",
+      });
+    } catch (error) {
+      console.error('Error adding transaction:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
+        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-32 w-32"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
@@ -144,6 +190,11 @@ const Dashboard = () => {
 
           {/* Dashboard Content */}
           <main className="p-6 flex-grow">
+            {successMessage && (
+              <div className="mb-4 p-4 text-center text-sm font-medium text-green-500 bg-green-100 rounded-lg">
+                {successMessage}
+              </div>
+            )}
             {/* MetaMask Integration */}
             <Card className="mb-6 bg-gray-800/60 backdrop-blur-xl border-gray-700">
               <CardHeader>
@@ -170,7 +221,7 @@ const Dashboard = () => {
                         </div>
                       ) : (
                         <p className="text-sm text-gray-400">
-                          
+                          Connect your wallet to manage funds
                         </p>
                       )}
                     </div>
@@ -244,7 +295,7 @@ const Dashboard = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400 font-bold">Loan Score</span>
                       <Badge className="bg-blue-500/20 text-green-400">
-                        {userData.accountType}
+                        {userData.score}
                       </Badge>
                     </div>
                     <div className="flex justify-between">
@@ -258,41 +309,71 @@ const Dashboard = () => {
                   </div>
                 </CardContent>
               </Card>
-
-              
             </div>
-            <Card className="mb-6 bg-gray-800/60 backdrop-blur-xl border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-gray-300">
-                  Pay Installment
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <IndianRupee className="h-8 w-8 text-gray-300" />
-                    <div>
-  
-                        <div>
-                          <p className="text-sm text-gray-400">
-                            Pay Now
-                          </p>
-                          <p className="font-mono text-sm text-gray-300">
-                            {}
-                          </p>
-                        </div>
-                      
+
+            <div className="grid gap-6 mb-6 mb-full grid-flow-row auto-rows-max md:auto-rows-min"> 
+              <Card className="bg-gray-800/60 backdrop-blur-xl border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-sm font-medium text-gray-300">
+                    Loan Progress
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-gray-400">Repayment Progress</span>
+                      <span className="text-gray-300">55%</span>
+                    </div>
+                    <div className="w-full h-3 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500 
+                          rounded-full transition-all duration-1000 ease-in-out"
+                        style={{ width: '55%' }}
+                      >
+                        <div className="animate-pulse-light"></div>
+                      </div>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>0%</span>
+                      <span>50%</span>
+                      <span>100%</span>
                     </div>
                   </div>
-                  <Button
-                    onClick={connectWallet}
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transform transition-all duration-200 hover:scale-[1.02]"
-                  >
-                    Pay Now
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              <Card className="mb-6 bg-gray-800/60 backdrop-blur-xl border-gray-700">
+                <CardHeader>
+                  <CardTitle className="text-gray-300">
+                    Pay Installment
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <IndianRupee className="h-8 w-8 text-gray-300 ml-5" />
+                      <div>
+                        <div>
+                          <p className="h-8 w-8 text-gray-300 text-2xl font-extrabold">5600 </p>
+                          <p className="text-sm text-gray-400">
+                            {/* Removed "Due in 10 Days" */}
+                          </p>
+                          <p className="font-mono text-sm text-gray-300">
+                            { }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handlePayNow}
+                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transform transition-all duration-200 hover:scale-[1.02]"
+                    >
+                      Pay Now
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </main>
 
           {/* Footer */}
@@ -308,7 +389,6 @@ const Dashboard = () => {
                 >
                   Support
                 </Button>
-                
                 <Button
                   variant="link"
                   className="text-gray-400 hover:text-gray-300"

@@ -41,8 +41,19 @@ const SignUpForm: React.FC = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       await sendEmailVerification(userCredential.user);
       await addDoc(collection(db, 'users'), {
-        ...formData,
-        password: hashedPassword
+        name: formData.name,
+        contact: formData.contact,
+        address: formData.address,
+        email: formData.email,
+        password: hashedPassword,
+        identityProof: formData.identityProof,
+        bankName: "FraudChain",
+        loanId: "1",
+        score: "85",
+        pendingInstallments: 3,
+        totalLoanAmount: " ₹0",
+        nextPayment: " ₹0",
+        dueDate: "Feb 15, 2025"
       });
       console.log('User added and verification email sent:', formData);
     } catch (err) {
