@@ -5,9 +5,9 @@ import BankDashboard from '@/components/BankDashboard';
 import ApplicationsTable from '@/components/ApplicationTable';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { CreditCard, DollarSign, FileText, Home, Settings, User } from "lucide-react";
+import { CreditCard,  FileText, Home, Settings, User, MessagesSquare } from "lucide-react";
 import ApplicationReview from '@/components/ApplicationReview';
-
+import Discussion from '@/components/discussion';
 const Page = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -33,6 +33,8 @@ const Page = () => {
         return <ApplicationsTable />;
       case 'credit':
         return <ApplicationReview />;
+      case 'forum':
+        return <Discussion />;
       default:
         return <BankDashboard />;
     }
@@ -61,6 +63,14 @@ const Page = () => {
             <Button
               variant="ghost"
               size="icon"
+              className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'applications' ? 'bg-gray-700/50' : ''}`}
+              onClick={() => handleTabChange('applications')}
+            >
+              <FileText className="h-6 w-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'credit' ? 'bg-gray-700/50' : ''}`}
               onClick={() => handleTabChange('credit')}
             >
@@ -69,20 +79,13 @@ const Page = () => {
             <Button
               variant="ghost"
               size="icon"
-              className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'dollar' ? 'bg-gray-700/50' : ''}`}
-              onClick={() => handleTabChange('dollar')}
+              className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'forum' ? 'bg-gray-700/50' : ''}`}
+              onClick={() => handleTabChange('forum')}
             >
-              <DollarSign className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`w-12 h-12 text-gray-300 hover:bg-gray-700/50 ${activeTab === 'applications' ? 'bg-gray-700/50' : ''}`}
-              onClick={() => handleTabChange('applications')}
-            >
-              <FileText className="h-6 w-6" />
-            </Button>
+              <MessagesSquare className="h-6 w-6" />
+          </Button>
           </nav>
+          
 
           <div className="mt-auto flex flex-col space-y-4">
             <Button
