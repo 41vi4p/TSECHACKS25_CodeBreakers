@@ -37,22 +37,21 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
+type Applicant = {
+  id: string;
+  name: string;
+  loanType: string;
+  loanAmount: string;
+  duration: string;
+  score: string;
+  status: string;
+};
 const BankDashboard = () => {
   const [whistleblowerReports, setWhistleblowerReports] = useState<any[]>([]);
   
-  const [applicants, setApplicants] = useState<
-    { id: number; name: string; loanAmount: string; status: string }[]
-  >([]);
-  const [selectedApplicant, setSelectedApplicant] = useState<{
-    id: number;
-    name: string;
-    loanAmount: string;
-    status: string;
-  } | null>(null);
-  const [approvedApplications, setApprovedApplications] = useState<
-    { id: number; name: string; loanAmount: string; status: string }[]
-  >([]);
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
+  const [approvedApplications, setApprovedApplications] = useState<Applicant[]>([]);
 
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
@@ -61,35 +60,48 @@ const BankDashboard = () => {
 
   let MMSDK: any = null;
 
-  // useEffect(() => {
-  //   const initializeMetaMask = async () => {
-  //     if (typeof window !== "undefined") {
-  //       const { MetaMaskSDK } = await import("@metamask/sdk");
-  //       MMSDK = new MetaMaskSDK({
-  //         dappMetadata: {
-  //           name: "Loan Application Dapp",
-  //           url: window.location.href,
-  //         },
-  //       });
-  //     }
-  //   };
-  //   initializeMetaMask();
-  // }, []);
-
   useEffect(() => {
-    // Fetch applicants from the database
+    const initializeMetaMask = async () => {
+      if (typeof window !== "undefined") {
+        const { MetaMaskSDK } = await import("@metamask/sdk");
+        MMSDK = new MetaMaskSDK({
+          dappMetadata: {
+            name: "Loan Application Dapp",
+            url: window.location.href,
+          },
+        });
+      }
+    };
+    initializeMetaMask();
+  }, []);
+
+useEffect(() => {
+    // Fetch applicants from the Firestore database
     const fetchApplicants = async () => {
-      // Replace with your database fetching logic
-      const applicantsData = [
-        { id: 1, name: "Alice", loanAmount: "₹1,000,000", status: "Pending" },
-        { id: 2, name: "Bob", loanAmount: "₹500,000", status: "Pending" },
-        // Add more applicants as needed
-      ];
-      setApplicants(applicantsData);
+      try {
+        const querySnapshot = await getDocs(collection(db, 'applications'));
+        const applicantsData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name,
+            loanType: data.loanType,
+            loanAmount: data.loanAmount,
+            duration: data.duration,
+            score: data.score,
+            status: data.status,
+          };
+        });
+        console.log("Applicants data: ", applicantsData);
+        setApplicants(applicantsData);
+      } catch (error) {
+        console.error("Error fetching applicants: ", error);
+      }
     };
 
     fetchApplicants();
   }, []);
+
 
   useEffect(() => {
     const fetchWhistleblowerReports = async () => {
@@ -98,19 +110,18 @@ const BankDashboard = () => {
         const reports = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
         setWhistleblowerReports(reports);
       } catch (err) {
-        console.error('Error fetching whistleblower reports:', err.message);
+        if (err instanceof Error) {
+          console.error('Error fetching whistleblower reports:', err.message);
+        } else {
+          console.error('Error fetching whistleblower reports:', err);
+        }
       }
     };
 
     fetchWhistleblowerReports();
   }, []);
 
-  const handleSelectApplicant = (applicant: {
-    id: number;
-    name: string;
-    loanAmount: string;
-    status: string;
-  }) => {
+  const handleSelectApplicant = (applicant: Applicant) => {
     setSelectedApplicant(applicant);
   };
 
@@ -142,25 +153,25 @@ const BankDashboard = () => {
     ],
   };
 
-  // const connectWallet = async () => {
-  //   try {
-  //     setError("");
-  //     if (!MMSDK) throw new Error("MetaMask SDK not initialized");
-  //     const ethereum = MMSDK.getProvider();
-  //     if (!ethereum) throw new Error("Please install MetaMask");
-  //     const accounts = await ethereum.request({
-  //       method: "eth_requestAccounts",
-  //     });
-  //     if (accounts[0]) setAccount(accounts[0]);
-  //   } catch (error) {
-  //     if (error instanceof Error) {
-  //       setError(error.message || "Failed to connect wallet");
-  //     } else {
-  //       setError("Failed to connect wallet");
-  //     }
-  //   }
-  //   setIsWalletConnected(true);
-  // };
+  const connectWallet = async () => {
+    try {
+      setError("");
+      if (!MMSDK) throw new Error("MetaMask SDK not initialized");
+      const ethereum = MMSDK.getProvider();
+      if (!ethereum) throw new Error("Please install MetaMask");
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      if (accounts[0]) setAccount(accounts[0]);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message || "Failed to connect wallet");
+      } else {
+        setError("Failed to connect wallet");
+      }
+    }
+    setIsWalletConnected(true);
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
@@ -196,7 +207,7 @@ const BankDashboard = () => {
                 </div>
               </div>
               <Button
-                // onClick={connectWallet}
+                onClick={connectWallet}
                 className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transform transition-all duration-200 hover:scale-[1.02]"
               >
                 {isWalletConnected ? "Disconnect Wallet" : "Connect MetaMask"}
@@ -215,17 +226,34 @@ const BankDashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-2">
-                    {applicants.map((applicant) => (
-                      <li
-                        key={applicant.id}
-                        className="cursor-pointer text-gray-300 hover:text-white"
-                        onClick={() => handleSelectApplicant(applicant)}
-                      >
-                        {applicant.name} - {applicant.loanAmount}
-                      </li>
-                    ))}
-                  </ul>
+                  <table className="min-w-full divide-y divide-gray-700">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Name
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Score
+                        </th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-700">
+                      {applicants.map((applicant) => (
+                        <tr
+                          key={applicant.id}
+                          className="cursor-pointer hover:bg-gray-700/50"
+                          onClick={() => handleSelectApplicant(applicant)}
+                        >
+                          <td className="px-4 py-2 text-sm text-gray-300">{applicant.name}</td>
+                          <td className="px-4 py-2 text-sm text-gray-300">{applicant.score}</td>
+                          <td className="px-4 py-2 text-sm text-gray-300">{applicant.status}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </CardContent>
               </Card>
 

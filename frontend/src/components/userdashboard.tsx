@@ -45,7 +45,7 @@ const Dashboard = () => {
         try {
           const querySnapshot = await getDocs(collection(db, 'users'));
           const userDocs = querySnapshot.docs.map((doc) => doc.data());
-          const userIndex = userDocs.findIndex(user => user.email === auth.currentUser.email);
+          const userIndex = userDocs.findIndex(user => sessionStorage.getItem("email") === user.email || user.email === auth.currentUser.email);
           if (userIndex !== -1) {
             console.log('User data fetched:', userDocs[userIndex]);
             setUserData(userDocs[userIndex]);
@@ -53,7 +53,11 @@ const Dashboard = () => {
             router.push('/user-login'); // Redirect to login if not authenticated
           }
         } catch (err) {
-          console.error('Error fetching user data:', err.message);
+          if (err instanceof Error) {
+            console.error('Error fetching user data:', err.message);
+          } else {
+            console.error('Error fetching user data:', err);
+          }
         }
       } else {
         router.push('/user-login'); // Redirect to login if not authenticated
