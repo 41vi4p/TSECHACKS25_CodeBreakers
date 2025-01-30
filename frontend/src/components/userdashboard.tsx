@@ -65,7 +65,7 @@ const Dashboard = () => {
     fetchUserData();
   }, [router]);
 
-  let MMSDK: any = null;
+  let MMSDK: null = null;
 
   const connectWallet = async () => {
     const ethereum = MMSDK.getProvider();
