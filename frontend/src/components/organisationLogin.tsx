@@ -36,7 +36,7 @@ const OrganisationLoginForm: React.FC = () => {
       setLoading(true);
       await signInWithEmailAndPassword(auth, formData.email, formData.password); // Use the raw password
       console.log('Organisation login successful:', formData);
-      router.push('/organisationDashboard'); // Replace '/organisationDashboard' with the actual path of the organization dashboard page
+      router.push('/org-dashboard'); // Replace '/organisationDashboard' with the actual path of the organization dashboard page
     } catch (err: any) {
       setError(`Authentication failed: ${err.message}`);
       console.error('Error during authentication:', err);
