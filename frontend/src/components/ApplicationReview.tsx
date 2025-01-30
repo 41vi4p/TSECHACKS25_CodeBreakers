@@ -18,7 +18,7 @@ interface Applicant {
   documents: string[];
 }
 
-const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+let MMSDK: any = null;
 
 const ApplicationReview = () => {
   const [loading, setLoading] = useState(false);
@@ -41,8 +41,6 @@ const ApplicationReview = () => {
 
     initializeMetaMask();
   });
-
-  let MMSDK: any = null;
 
   const connectWallet = async () => {
     try {
@@ -170,7 +168,6 @@ const ApplicationReview = () => {
 
   const handleReject = () => updateApplicationStatus("Rejected");
 
-
   if (error) {
     return (
       <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 p-6 flex items-center justify-center">
@@ -187,7 +184,7 @@ const ApplicationReview = () => {
     );
   }
 
-  return ( 
+  return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 p-6">
       <Card className="bg-gray-800/60 backdrop-blur-xl border-gray-700 max-w-3xl mx-auto">
         <CardHeader>

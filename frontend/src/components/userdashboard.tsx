@@ -15,12 +15,18 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ethers } from "ethers";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { auth, db } from '@/lib/firebase'; // Adjust the import path as necessary
-import { useRouter } from 'next/navigation';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import { auth, db } from "@/lib/firebase"; // Adjust the import path as necessary
+import { useRouter } from "next/navigation";
 
 const Dashboard = () => {
-  const router = useRouter();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [userData, setUserData] = useState<any>(null);
@@ -39,57 +45,73 @@ const Dashboard = () => {
         });
       }
     };
+    initializeMetaMask();
+  }, []);
 
+  let MMSDK: any = null;
+  const router = useRouter();
+  useEffect(() => {
     const fetchUserData = async () => {
       if (auth.currentUser) {
         try {
-          const querySnapshot = await getDocs(collection(db, 'users'));
+          const querySnapshot = await getDocs(collection(db, "users"));
           const userDocs = querySnapshot.docs.map((doc) => doc.data());
-          const userIndex = userDocs.findIndex(user => sessionStorage.getItem("email") === user.email || user.email === auth.currentUser.email);
+          const userIndex = userDocs.findIndex(
+            (user) =>
+              sessionStorage.getItem("email") === user.email ||
+              user.email === auth.currentUser.email
+          );
           if (userIndex !== -1) {
-            console.log('User data fetched:', userDocs[userIndex]);
+            console.log("User data fetched:", userDocs[userIndex]);
             setUserData(userDocs[userIndex]);
           } else {
-            router.push('/user-login'); // Redirect to login if not authenticated
+            router.push("/user-login"); // Redirect to login if not authenticated
           }
         } catch (err) {
           if (err instanceof Error) {
-            console.error('Error fetching user data:', err.message);
+            console.error("Error fetching user data:", err.message);
           } else {
-            console.error('Error fetching user data:', err);
+            console.error("Error fetching user data:", err);
           }
         }
       } else {
-        router.push('/user-login'); // Redirect to login if not authenticated
+        router.push("/user-login"); // Redirect to login if not authenticated
       }
       setLoading(false);
     };
 
-    initializeMetaMask();
     fetchUserData();
   }, [router]);
 
-  let MMSDK: null = null;
-
   const connectWallet = async () => {
-    const ethereum = MMSDK.getProvider();
-    const provider = new ethers.BrowserProvider(ethereum);
-    const signer = await provider.getSigner();
+    try {
+      if (!MMSDK) throw new Error("MetaMask SDK not initialized");
+      const ethereum = MMSDK.getProvider();
+      if (!ethereum) throw new Error("Please install MetaMask");
+      const accounts = await ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      setWalletAddress(accounts[0].toString());
+    } catch (error) {
+      console.error("Error connecting wallet:", error);
+    }
     setIsWalletConnected(true);
-    setWalletAddress((await signer.getAddress()).toString());
   };
 
   const handlePayNow = async () => {
     try {
       const timestamp = new Date().toISOString();
-      await addDoc(collection(db, 'transactions'), {
+      await addDoc(collection(db, "transactions"), {
         userId: auth.currentUser?.uid,
         userName: userData.name,
         loanId: userData.loanId,
         amountPaid: userData.nextPayment,
         timestamp,
       });
-      console.log('Transaction added:', { userId: auth.currentUser?.uid, timestamp });
+      console.log("Transaction added:", {
+        userId: auth.currentUser?.uid,
+        timestamp,
+      });
       setSuccessMessage("Transaction successful! Next payment due in 30 days.");
       setTimeout(() => setSuccessMessage(""), 5000); // Clear message after 5 seconds
       // Reset the timer to 30 days
@@ -103,12 +125,12 @@ const Dashboard = () => {
         pendingInstallments: updatedPendingInstallments,
       });
       // Update pending installments in the database
-      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+      const userDocRef = doc(db, "users", auth.currentUser.uid);
       await updateDoc(userDocRef, {
         pendingInstallments: updatedPendingInstallments,
       });
     } catch (error) {
-      console.error('Error adding transaction:', error);
+      console.error("Error adding transaction:", error);
     }
   };
 
@@ -304,7 +326,9 @@ const Dashboard = () => {
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-400 font-bold">Loan Score</span>
+                      <span className="text-gray-400 font-bold">
+                        Loan Score
+                      </span>
                       <Badge className="bg-blue-500/20 text-green-400">
                         {userData.score}
                       </Badge>
@@ -322,7 +346,7 @@ const Dashboard = () => {
               </Card>
             </div>
 
-            <div className="grid gap-6 mb-6 mb-full grid-flow-row auto-rows-max md:auto-rows-min"> 
+            <div className="grid gap-6 mb-6 mb-full grid-flow-row auto-rows-max md:auto-rows-min">
               <Card className="bg-gray-800/60 backdrop-blur-xl border-gray-700">
                 <CardHeader>
                   <CardTitle className="text-sm font-medium text-gray-300">
@@ -339,7 +363,7 @@ const Dashboard = () => {
                       <div
                         className="h-full bg-gradient-to-r from-blue-500 to-purple-500 
                           rounded-full transition-all duration-1000 ease-in-out"
-                        style={{ width: '55%' }}
+                        style={{ width: "55%" }}
                       >
                         <div className="animate-pulse-light"></div>
                       </div>
@@ -365,13 +389,13 @@ const Dashboard = () => {
                       <IndianRupee className="h-8 w-8 text-gray-300 ml-5" />
                       <div>
                         <div>
-                          <p className="h-8 w-8 text-gray-300 text-2xl font-extrabold">5600 </p>
+                          <p className="h-8 w-8 text-gray-300 text-2xl font-extrabold">
+                            5600{" "}
+                          </p>
                           <p className="text-sm text-gray-400">
                             {/* Removed "Due in 10 Days" */}
                           </p>
-                          <p className="font-mono text-sm text-gray-300">
-                            { }
-                          </p>
+                          <p className="font-mono text-sm text-gray-300">{}</p>
                         </div>
                       </div>
                     </div>

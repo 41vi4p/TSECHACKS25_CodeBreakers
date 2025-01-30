@@ -25,8 +25,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase'; // Adjust the import path as necessary
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase"; // Adjust the import path as necessary
+import LoanManagement from "../../../artifacts/contracts/FraudChain.sol/LoanManagement.json";
 
 ChartJS.register(
   CategoryScale,
@@ -46,25 +47,28 @@ type Applicant = {
   score: string;
   status: string;
 };
+let MMSDK: any = null;
 const BankDashboard = () => {
   const [whistleblowerReports, setWhistleblowerReports] = useState<any[]>([]);
-  
+
   const [applicants, setApplicants] = useState<Applicant[]>([]);
-  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
-  const [approvedApplications, setApprovedApplications] = useState<Applicant[]>([]);
+  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
+    null
+  );
+  const [approvedApplications, setApprovedApplications] = useState<Applicant[]>(
+    []
+  );
 
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [account, setAccount] = useState("");
   const [error, setError] = useState("");
 
-  let MMSDK: any = null;
-
   useEffect(() => {
     const initializeMetaMask = async () => {
       if (typeof window !== "undefined") {
         const { MetaMaskSDK } = await import("@metamask/sdk");
-        MMSDK = new MetaMaskSDK({
+        MMSDK = await new MetaMaskSDK({
           dappMetadata: {
             name: "Loan Application Dapp",
             url: window.location.href,
@@ -75,11 +79,11 @@ const BankDashboard = () => {
     initializeMetaMask();
   }, []);
 
-useEffect(() => {
+  useEffect(() => {
     // Fetch applicants from the Firestore database
     const fetchApplicants = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'applications'));
+        const querySnapshot = await getDocs(collection(db, "applications"));
         const applicantsData = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           return {
@@ -102,18 +106,22 @@ useEffect(() => {
     fetchApplicants();
   }, []);
 
-
   useEffect(() => {
     const fetchWhistleblowerReports = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'whistleblowerReports'));
-        const reports = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        const querySnapshot = await getDocs(
+          collection(db, "whistleblowerReports")
+        );
+        const reports = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
         setWhistleblowerReports(reports);
       } catch (err) {
         if (err instanceof Error) {
-          console.error('Error fetching whistleblower reports:', err.message);
+          console.error("Error fetching whistleblower reports:", err.message);
         } else {
-          console.error('Error fetching whistleblower reports:', err);
+          console.error("Error fetching whistleblower reports:", err);
         }
       }
     };
@@ -125,7 +133,29 @@ useEffect(() => {
     setSelectedApplicant(applicant);
   };
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
+    if (!MMSDK) {
+      throw new Error("MetaMask SDK not initialized");
+    }
+
+    const ethereum = MMSDK.getProvider();
+    if (!ethereum) {
+      throw new Error("MetaMask not found");
+    }
+
+    const provider = new ethers.BrowserProvider(ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(
+      "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      LoanManagement.abi,
+      signer
+    );
+
+    const tx = await contract.approveLoan(await signer.getAddress());
+    await tx.wait();
+
+    alert("Loan application Approved successfully!");
+
     if (selectedApplicant) {
       setApprovedApplications([
         ...approvedApplications,
@@ -247,9 +277,15 @@ useEffect(() => {
                           className="cursor-pointer hover:bg-gray-700/50"
                           onClick={() => handleSelectApplicant(applicant)}
                         >
-                          <td className="px-4 py-2 text-sm text-gray-300">{applicant.name}</td>
-                          <td className="px-4 py-2 text-sm text-gray-300">{applicant.score}</td>
-                          <td className="px-4 py-2 text-sm text-gray-300">{applicant.status}</td>
+                          <td className="px-4 py-2 text-sm text-gray-300">
+                            {applicant.name}
+                          </td>
+                          <td className="px-4 py-2 text-sm text-gray-300">
+                            {applicant.score}
+                          </td>
+                          <td className="px-4 py-2 text-sm text-gray-300">
+                            {applicant.status}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -338,19 +374,24 @@ useEffect(() => {
                 <Line data={sanctionedLoansData} />
               </CardContent>
             </Card>
-                    <br></br>
+            <br></br>
             <Card className="bg-gray-800/60 flex flex-col w-full justify-center items-center backdrop-blur-xl border-gray-700">
               <CardHeader>
                 <CardTitle className="text-sm font-medium text-gray-300">
-                 Anonymous Reports
+                  Anonymous Reports
                 </CardTitle>
               </CardHeader>
               <CardContent className="min-w-[68%]  ">
                 <div className="space-y-4">
                   {whistleblowerReports.map((report) => (
-                    <div key={report.id} className="p-4 bg-gray-700/50 rounded-lg">
+                    <div
+                      key={report.id}
+                      className="p-4 bg-gray-700/50 rounded-lg"
+                    >
                       <p className="text-sm text-gray-300">{report.message}</p>
-                      <p className="text-xs text-gray-400 mt-2">{report.timestamp}</p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        {report.timestamp}
+                      </p>
                     </div>
                   ))}
                 </div>
