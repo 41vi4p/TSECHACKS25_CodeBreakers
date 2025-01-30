@@ -25,9 +25,13 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase"; // Adjust the import path as necessary
 import { useRouter } from "next/navigation";
+import LoanManagement from "../../../artifacts/contracts/FraudChain.sol/LoanManagement.json";
+
+let MMSDK: any = null;
 import {LoanSelectionPage} from "userdashboard"
 
 const Dashboard = () => {
+  const router = useRouter();
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [userData, setUserData] = useState<any>(null);
@@ -49,8 +53,6 @@ const Dashboard = () => {
     initializeMetaMask();
   }, []);
 
-  let MMSDK: any = null;
-  const router = useRouter();
   useEffect(() => {
     const fetchUserData = async () => {
       if (auth.currentUser) {
@@ -100,6 +102,28 @@ const Dashboard = () => {
   };
 
   const handlePayNow = async () => {
+    if (!MMSDK) {
+      throw new Error("MetaMask SDK not initialized");
+    }
+
+    const ethereum = MMSDK.getProvider();
+    if (!ethereum) {
+      throw new Error("MetaMask not found");
+    }
+
+    const provider = new ethers.BrowserProvider(ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(
+      "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      LoanManagement.abi,
+      signer
+    );
+
+    const tx = await contract.repayLoan(await signer.getAddress());
+    await tx.wait();
+
+    alert("Loan payment successful!");
+
     try {
       const timestamp = new Date().toISOString();
       await addDoc(collection(db, "transactions"), {
