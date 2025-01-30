@@ -5,16 +5,17 @@ import ApplicationsTable from '@/components/ApplicationTable';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { CreditCard, DollarSign, FileText, Home, Settings, User } from "lucide-react";
-
+import ApplicationReview from '@/components/ApplicationReview';
 const Page = () => {
   const [activeTab, setActiveTab] = useState('home');
-
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
         return <BankDashboard />;
       case 'applications':
         return <ApplicationsTable />;
+      case 'credit':
+        return <ApplicationReview />;
       default:
         return <BankDashboard />;
     }

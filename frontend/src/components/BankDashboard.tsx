@@ -152,8 +152,12 @@ const BankDashboard = () => {
         method: "eth_requestAccounts",
       });
       if (accounts[0]) setAccount(accounts[0]);
-    } catch (err) {
-      setError(err.message || "Failed to connect wallet");
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message || "Failed to connect wallet");
+      } else {
+        setError("Failed to connect wallet");
+      }
     }
     setIsWalletConnected(true);
   };
