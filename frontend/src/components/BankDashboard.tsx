@@ -61,20 +61,20 @@ const BankDashboard = () => {
 
   let MMSDK: any = null;
 
-  useEffect(() => {
-    const initializeMetaMask = async () => {
-      if (typeof window !== "undefined") {
-        const { MetaMaskSDK } = await import("@metamask/sdk");
-        MMSDK = new MetaMaskSDK({
-          dappMetadata: {
-            name: "Loan Application Dapp",
-            url: window.location.href,
-          },
-        });
-      }
-    };
-    initializeMetaMask();
-  }, []);
+  // useEffect(() => {
+  //   const initializeMetaMask = async () => {
+  //     if (typeof window !== "undefined") {
+  //       const { MetaMaskSDK } = await import("@metamask/sdk");
+  //       MMSDK = new MetaMaskSDK({
+  //         dappMetadata: {
+  //           name: "Loan Application Dapp",
+  //           url: window.location.href,
+  //         },
+  //       });
+  //     }
+  //   };
+  //   initializeMetaMask();
+  // }, []);
 
   useEffect(() => {
     // Fetch applicants from the database
@@ -142,25 +142,25 @@ const BankDashboard = () => {
     ],
   };
 
-  const connectWallet = async () => {
-    try {
-      setError("");
-      if (!MMSDK) throw new Error("MetaMask SDK not initialized");
-      const ethereum = MMSDK.getProvider();
-      if (!ethereum) throw new Error("Please install MetaMask");
-      const accounts = await ethereum.request({
-        method: "eth_requestAccounts",
-      });
-      if (accounts[0]) setAccount(accounts[0]);
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message || "Failed to connect wallet");
-      } else {
-        setError("Failed to connect wallet");
-      }
-    }
-    setIsWalletConnected(true);
-  };
+  // const connectWallet = async () => {
+  //   try {
+  //     setError("");
+  //     if (!MMSDK) throw new Error("MetaMask SDK not initialized");
+  //     const ethereum = MMSDK.getProvider();
+  //     if (!ethereum) throw new Error("Please install MetaMask");
+  //     const accounts = await ethereum.request({
+  //       method: "eth_requestAccounts",
+  //     });
+  //     if (accounts[0]) setAccount(accounts[0]);
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       setError(error.message || "Failed to connect wallet");
+  //     } else {
+  //       setError("Failed to connect wallet");
+  //     }
+  //   }
+  //   setIsWalletConnected(true);
+  // };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900">
@@ -196,7 +196,7 @@ const BankDashboard = () => {
                 </div>
               </div>
               <Button
-                onClick={connectWallet}
+                // onClick={connectWallet}
                 className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white transform transition-all duration-200 hover:scale-[1.02]"
               >
                 {isWalletConnected ? "Disconnect Wallet" : "Connect MetaMask"}
